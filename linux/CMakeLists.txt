@@ -7,6 +7,12 @@ cmake_minimum_required(VERSION 3.10)
 set(PROJECT_NAME "rust_ffi_plugin")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# Replace add_subdirectory that references old C++ code with Cargokit:
+include("../cargokit/cmake/cargokit.cmake")
+apply_cargokit(${PROJECT_NAME} ../rust rust_ffi_plugin "")
+# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 # Invoke the build for native code shared with the other target platforms.
 # This can be changed to accommodate different builds.
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src" "${CMAKE_CURRENT_BINARY_DIR}/shared")
@@ -17,6 +23,12 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src" "${CMAKE_CURRENT_BINARY_DI
 set(rust_ffi_plugin_bundled_libraries
   # Defined in ../src/CMakeLists.txt.
   # This can be changed to accommodate different builds.
-  $<TARGET_FILE:rust_ffi_plugin>
+
+  # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  # Replace original target file with the one produced by Cargokit:
+  "${${PROJECT_NAME}_cargokit_lib}"
+  # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+  # $<TARGET_FILE:rust_ffi_plugin>
   PARENT_SCOPE
 )
